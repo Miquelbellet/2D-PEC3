@@ -264,6 +264,10 @@ public class WormAnimationsScript : MonoBehaviour
     }
     public void Died()
     {
+        Invoke("ActivateDieAnimation", 2f);
+    }
+    void ActivateDieAnimation()
+    {
         animController.SetTrigger("died");
     }
 }

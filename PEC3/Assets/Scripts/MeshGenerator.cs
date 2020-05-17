@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class MeshGenerator : MonoBehaviour {
 
-    public GameControllerScript gameController;
+    public GameObject gameController;
     public GameObject explosionPrefab, uziHitPrefab;
     public SquareGrid squareGrid;
 	public MeshFilter mapMesh;
@@ -22,6 +22,7 @@ public class MeshGenerator : MonoBehaviour {
     void Start()
     {
         collisionEvents = new List<ParticleCollisionEvent>();
+        weaponsScript = GameObject.FindWithTag("Player").GetComponent<WormWeaponsScript>();
     }
 
     public void GenerateMesh(int[,] map, float squareSize) {
@@ -275,11 +276,11 @@ public class MeshGenerator : MonoBehaviour {
     {
         if (collision.tag == "Missile")
         {
-            weaponsScript = GameObject.FindWithTag("Player").GetComponent<WormWeaponsScript>();
+            gameController.GetComponent<SoundEffectsScript>().ExplosionClip();
             collision.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             collision.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
             GameObject explosion = Instantiate(explosionPrefab, collision.transform.position, Quaternion.Euler(new Vector3(0, 0, 0)));
-            gameController.FindExplosionHit(collision.transform.position, weaponsScript.missileDamage, weaponsScript.missileExplosionRange);
+            gameController.GetComponent<GameControllerScript>().FindExplosionHit(collision.transform.position, weaponsScript.missileDamage, weaponsScript.missileExplosionRange);
             Destroy(collision.gameObject);
             Destroy(explosion, 3f);
         }
@@ -287,15 +288,14 @@ public class MeshGenerator : MonoBehaviour {
 
     void OnParticleCollision(GameObject other)
     {
-        weaponsScript = GameObject.FindWithTag("Player").GetComponent<WormWeaponsScript>();
-        ParticleSystem uziPartSys = GameObject.FindWithTag("GameController").GetComponent<GameControllerScript>().activeWorm.transform.GetChild(2).GetComponent<ParticleSystem>();
+        ParticleSystem uziPartSys = gameController.GetComponent<GameControllerScript>().activeWorm.transform.GetChild(2).GetComponent<ParticleSystem>();
         uziPartSys.GetCollisionEvents(gameObject, collisionEvents);
 
         for (int i = 0; i < collisionEvents.Count; i++)
         {
             Vector3 pos = collisionEvents[i].intersection;
             GameObject uziHit = Instantiate(uziHitPrefab, pos, Quaternion.Euler(new Vector2(0, 0)));
-            gameController.FindExplosionHit(pos, weaponsScript.uziBulletDamage, weaponsScript.uziExplosionRadius);
+            gameController.GetComponent<GameControllerScript>().FindExplosionHit(pos, weaponsScript.uziBulletDamage, weaponsScript.uziExplosionRadius);
             Destroy(uziHit, 1f);
         }
     }

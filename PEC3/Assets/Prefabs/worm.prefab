@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 1148532608880971996}
   - component: {fileID: 1148532608880971999}
   - component: {fileID: 1148532608880971998}
+  - component: {fileID: 7933078119390015118}
   m_Layer: 8
   m_Name: worm
   m_TagString: Player
@@ -160,7 +161,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_Sprite: {fileID: -724476805733727411, guid: 96abf6ef4c24e90458ec017c77f36fe6,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -353,6 +354,7 @@ MonoBehaviour:
   deadExplosionDamage: 20
   deadExplosionRadius: 0.5
   isDead: 0
+  currentHeath: 0
 --- !u!114 &1148532608880971996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,6 +369,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   missilePrefab: {fileID: 4030008946592862492, guid: 173e17d2d1dc3e7478e17739c3d96441,
     type: 3}
+  explosionPrefab: {fileID: 4210985170295922123, guid: 00a03e951f056cf4f807e31a2c4bd8ff,
+    type: 3}
   airJetsPrefab: {fileID: 814901291012003874, guid: 5fd80ec2f96f12f4299c1a4501c93174,
     type: 3}
   uziHitPrefab: {fileID: 9079842304283330430, guid: e108223d01634a845ab633b1b735e455,
@@ -375,9 +379,11 @@ MonoBehaviour:
   maxMissileDistance: 80
   missileDamage: 25
   missileExplosionRange: 0.5
+  axHitDamage: 35
   axHitRange: 0.45
   uziBulletDamage: 2
   uziExplosionRadius: 0.2
+  currentWeapon: 0
 --- !u!114 &1148532608880971999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,8 +396,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 009f8c779fb019241946a84dccbbf1b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementForce: 0.005
+  movementForce: 0.0035
   jumpForce: 170
+  jetpackUpDivider: 50
+  jetpackMovementMultiplier: 2.5
   isUsingJetpack: 0
   allowMovement: 0
 --- !u!114 &1148532608880971998
@@ -501,6 +509,25 @@ MonoBehaviour:
   - {fileID: -104309973087872684, guid: 8e81d5fd52e8b364b861f6ac3a412085, type: 3}
   isWalking: 0
   isJumping: 0
+--- !u!114 &7933078119390015118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1148532608880972004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03174b8eb1f285549af26519100a79ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkingForce: 0.005
+  walkingTime: 6
+  airAttackRange: 6
+  bazookaRange: 4
+  uziRange: 2
+  axHitRange: 0.5
+  scriptActivated: 0
 --- !u!1 &1148532609284041749
 GameObject:
   m_ObjectHideFlags: 0

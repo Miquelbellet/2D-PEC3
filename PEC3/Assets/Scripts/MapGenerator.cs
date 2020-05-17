@@ -15,15 +15,15 @@ public class MapGenerator : MonoBehaviour {
 	int height;
 	int[,] map;
 
-	void Start() {
+    void Start() {
         width = backgroundCanvas.worldCamera.scaledPixelWidth/2;
         height = backgroundCanvas.worldCamera.scaledPixelHeight/2;
         GenerateMap();
-	}
+    }
 
 	void Update() {
 
-	}
+    }
 
 	void GenerateMap() {
 		map = new int[width,height];

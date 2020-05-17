@@ -2,35 +2,43 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameControllerScript : MonoBehaviour
 {
-    public Camera mainCam;
     [Range(1f, 15f)] public float cameraDistance;
-    public GameObject allWormsObj;
+    public float cameraTransitionTime;
+    public GameObject allWormsObj, allDecorationObj;
     [HideInInspector] public GameObject activeWorm;
+    [HideInInspector] public bool playingWithAI;
 
-    private int mapNumber;
+    private SoundEffectsScript soundsScript;
+    private int mapNumber, numActiveWorm;
     private GameObject[] wormsList;
-    private int numActiveWorm;
+    private bool isChangingPlayer;
+    private List<int> numberDeads = new List<int>();
     private void Awake()
     {
         initParams();
     }
     void Start()
     {
-        
+
     }
 
     void Update()
     {
-        mainCam.transform.position = new Vector3(activeWorm.transform.position.x, activeWorm.transform.position.y, -cameraDistance);
+        if(activeWorm.gameObject) Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(activeWorm.transform.position.x, activeWorm.transform.position.y, Camera.main.transform.position.z), cameraTransitionTime * Time.deltaTime);
     }
     void initParams()
     {
+        soundsScript = GetComponent<SoundEffectsScript>();
         mapNumber = PlayerPrefs.GetInt("mapNumber", 1);
+        if (PlayerPrefs.GetString("playAi", "true") == "true") playingWithAI = true;
+        else playingWithAI = false;
         allWormsObj.transform.GetChild(mapNumber - 1).gameObject.SetActive(true);
-        wormsList = new GameObject[4];
+        allDecorationObj.transform.GetChild(mapNumber - 1).gameObject.SetActive(true);
+        wormsList = new GameObject[mapNumber*2];
         for (int i = 0; i < allWormsObj.transform.GetChild(mapNumber - 1).childCount; i++)
         {
             wormsList[i] = allWormsObj.transform.GetChild(mapNumber - 1).GetChild(i).gameObject;
@@ -39,9 +47,29 @@ public class GameControllerScript : MonoBehaviour
     }
     public void NextPlayer()
     {
-        if (numActiveWorm < wormsList.Length-1) numActiveWorm++;
-        else numActiveWorm = 0;
-        activeWorm = wormsList[numActiveWorm];
+        GetComponent<UIScript>().hasWormAttacked = true;
+        Invoke("ChangeFocusWorm", 4f);
+        isChangingPlayer = true;
+    }
+    void ChangeFocusWorm()
+    {
+        if (isChangingPlayer)
+        {
+            isChangingPlayer = false;
+            if (numActiveWorm < wormsList.Length - 1) numActiveWorm++;
+            else numActiveWorm = 0;
+
+            if (!numberDeads.Contains(numActiveWorm))
+            {
+                soundsScript.SelectWormClip();
+                activeWorm = wormsList[numActiveWorm];
+                if (playingWithAI && activeWorm.GetComponent<WormHealthScript>().teamNumber == 2)
+                {
+                    activeWorm.GetComponent<WormAIEnemieScript>().BeginAI();
+                }
+                else GetComponent<UIScript>().hasWormAttacked = false;
+            }
+        }
     }
     void CheckingWinner()
     {
@@ -55,6 +83,13 @@ public class GameControllerScript : MonoBehaviour
         }
         if (!blueSurvivors) TeamWins(2);
         else if (!redSurvivors) TeamWins(1);
+    }
+    public void WormDied(GameObject deadWorm)
+    {
+        for(int i = 0; i < wormsList.Length - 1; i++)
+        {
+            if (wormsList[i] == deadWorm) numberDeads.Add(i);
+        }
     }
     public void CheckForWinner()
     {
@@ -74,11 +109,17 @@ public class GameControllerScript : MonoBehaviour
     }
     public void TeamWins(int winnerTeam)
     {
-        Debug.Log("The Winner Team is: "+ winnerTeam);
+        GetComponent<UIScript>().SetTextWinner(winnerTeam);
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject player in players)
         {
             if (player.GetComponent<WormHealthScript>().teamNumber == winnerTeam) player.GetComponent<WormAnimationsScript>().Winner();
         }
+        soundsScript.WinningClip();
+        Invoke("GoToMenuPage", 4f);
+    }
+    void GoToMenuPage()
+    {
+        SceneManager.LoadScene("MenuScene");
     }
 }
