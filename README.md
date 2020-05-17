@@ -1,4 +1,4 @@
-# PEC2
+# PEC3
 Practica PEC3 de l'assignatura de Programació de Videojocs en 2D.
 
 Per veure i poder descarregar aquest projecte anar a: [https://gitlab.com/miquel.bellet/PEC3/-/tags/PEC3](https://gitlab.com/miquel.bellet/PEC3/-/tags/PEC3)
